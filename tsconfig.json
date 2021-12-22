@@ -1,0 +1,12 @@
+{
+    "include": ["./src/**/*.ts"],
+    "exclude": ["dist"],
+    "rootDir": "src",
+    "compilerOptions": {
+        "module": "esnext",
+        "target": "esnext",
+        "strict": true,
+        "esModuleInterop": true,
+        "outDir": "dist"
+    }
+}

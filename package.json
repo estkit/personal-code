@@ -1,0 +1,38 @@
+{
+    "name": "@estkit/personal-code",
+    "description": "Parse Estonian Personal Identification Numbers",
+    "author": "Doomnoodles <doomnoodles@hotmail.com> ",
+    "repository": "github:estkit/personal-code",
+    "version": "0.0.4",
+    "license": "MIT",
+    "keywords": [
+        "isikukood",
+        "personal identification number",
+        "Estonia",
+        "Eesti",
+        "parser",
+        "validator"
+    ],
+    "type": "module",
+    "main": "dist/node/index.cjs",
+    "module": "dist/module/index.mjs",
+    "browser": "dist/browser/index.js",
+    "types": "dist/index.d.ts",
+    "devDependencies": {
+        "@rollup/plugin-typescript": "^8.3.0",
+        "@types/jest": "^27.0.3",
+        "jest": "^27.4.5",
+        "rollup": "^2.61.1",
+        "rollup-plugin-dts": "^4.0.1",
+        "ts-jest": "^27.1.2",
+        "typescript": "^4.5.4"
+    },
+    "scripts": {
+        "build": "rollup -c",
+        "dev": "rollup -c -w",
+        "test": "jest"
+    },
+    "files": [
+        "dist"
+    ]
+}
