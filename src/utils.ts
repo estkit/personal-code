@@ -1,3 +1,5 @@
+import { MinMax, ActualNumber } from "./types";
+
 /**
  * Calculates the checksum of an Estonian personal identification code
  * using one or two passes of modulo-11 checkdigit algorithm.
@@ -109,5 +111,32 @@ export function isNumeric(str: string) {
 
 // isNaN() is not used here because it accepts ".", which is not acceptable here.
 export function intOrNaN(str: string, len = 0) {
-    return isNumeric(str) && (len && str.length === len) ? parseInt(str, 10) : NaN;
+    return isNumeric(str) && (len === 0 || str.length === len) ? parseInt(str, 10) : NaN;
 }
+
+export function removeFromEnd(str: string, char: string) {
+    let lastIndex = str.length;
+    for(let i = lastIndex - 1; i >= 0; i--) {
+        if(str[i] !== char) break;
+        lastIndex = i;
+    }
+    return str.slice(0, lastIndex);
+}
+
+export function hasLeapYears(year: MinMax & ActualNumber) {
+    const { min, max, actual } = year;
+    if(isInteger(actual)) return !(actual % 4);
+    else if(isInteger(min) && isInteger(max)) {
+        const nextLeapYear = min + 3 * (min % 4);
+        return min <= nextLeapYear && max >= nextLeapYear;
+    }
+    throw new Error("Invalid year");
+}
+
+// no validity check
+export function getMonthMaxDay(month: number, year: number) {
+    return month !== 2 ? 30 + ((month || 1) % 2) : (28 + Number(!((year || 0) % 4)));
+}
+
+export const isInteger = (v: unknown): v is number => Number.isInteger(v);
+export const asStrSlice = (v: any, i1: number, i2: number): string => v.toString().slice(i1, i2);

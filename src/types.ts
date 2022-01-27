@@ -1,24 +1,34 @@
 export type IsikukoodParsed = {
-    errors?: IsikukoodErrors,
-    data?: IsikukoodData
+    errors: IsikukoodErrors,
+    results: IsikukoodResults
 }
 
+export type MinMax = { min?: number, max?: number };
+export type ActualNumber = { actual?: number };
+export type RequiredNumber = { required?: number };
+
 export type IsikukoodData = {
-    gender?: "male" | "female",
-    year?: number,
-    month?: number,
-    day?: number,
-    id?: number,
-    checksum?: number
+    gender?: { actual: "male" | "female" | "any" },
+    year?: MinMax & ActualNumber,
+    shortYear?: MinMax & ActualNumber,
+    month?: MinMax & ActualNumber,
+    day?: MinMax & ActualNumber,
+    serial?: MinMax & ActualNumber,
+    checksum?: MinMax & ActualNumber
+}
+
+export type IsikukoodResults = IsikukoodData & {
+    code: string;
+    valid: boolean;
 }
 
 export type IsikukoodErrors = {
     length?: LengthError
-    gender?: GenderError
-    year?: YearError
+    genderAndCentury?: GenderAndCenturyError
+    shortYear?: ShortYearError
     month?: MonthError
     day?: DayError
-    id?: IdError
+    serial?: SerialError
     checksum?: ChecksumError
 }
 
@@ -27,13 +37,13 @@ export type LengthError = {
     actual: number
 }
 
-export type GenderError = {
+export type GenderAndCenturyError = {
     min: 1,
-    max: 9,
+    max: 8,
     actual: string
 }
 
-export type YearError = {
+export type ShortYearError = {
     min: 0,
     max: 99,
     actual: string
@@ -51,8 +61,8 @@ export type DayError = {
     actual: string
 }
 
-export type IdError = {
-    min: 0,
+export type SerialError = {
+    min: 1,
     max: 999,
     actual: string
 }
@@ -60,4 +70,17 @@ export type IdError = {
 export type ChecksumError = {
     required: number,
     actual: string
+} | {
+    min: number,
+    max: number,
+    actual: string,
 }
+
+export type ParseOptions = {
+    placeholders: boolean,
+    checklength: boolean
+}
+
+export type ConsumeCallback = (amount: number) => string;
+export type DecoderCallback = (str: string, obj: IsikukoodParsed) => void;
+export type EncoderCallback = (data: IsikukoodData) => string;
