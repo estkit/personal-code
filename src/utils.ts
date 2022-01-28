@@ -130,12 +130,65 @@ export function hasLeapYears(year: MinMax & ActualNumber) {
         const nextLeapYear = min + 3 * (min % 4);
         return min <= nextLeapYear && max >= nextLeapYear;
     }
-    throw new Error("Invalid year");
+    // throw new Error("Invalid year");
+    return true;
+}
+
+export function tryIntoActual(minMaxActual: MinMax & ActualNumber) {
+    const { actual, min, max } = minMaxActual;
+    if(isInteger(actual)) {
+        return { actual };
+    } else if(isInteger(min) && isInteger(max)) {
+        return (max - min) ? { min, max } : { actual: min };
+    }
+    throw new Error("Not minmaxactual");
+}
+
+export function asMinMax(minMaxActual: MinMax & ActualNumber) {
+    const { actual, min, max } = minMaxActual;
+    if(isInteger(actual)) {
+        return { min: actual, max: actual };
+    } else if(isInteger(min) && isInteger(max)) {
+        return { min, max };
+    }
+    throw new Error("Not minmaxactual");
 }
 
 // no validity check
 export function getMonthMaxDay(month: number, year: number) {
-    return month !== 2 ? 30 + ((month || 1) % 2) : (28 + Number(!((year || 0) % 4)));
+    return month !== 2 ? 30 + ((month > 7 ? month + 1 : (month || 1)) % 2) : (28 + Number(!((year || 0) % 4)));
+}
+
+export function normalizeMinMax(withminmax?: MinMax): MinMax & ActualNumber | undefined {
+    return withminmax && ((withminmax.max! - withminmax.min!) === 0) ? { actual: withminmax.min } : withminmax;
+}
+
+export function intersectDecodeAndRangeIntersect(pattern: string, minPattern: string, maxPattern: string) {
+    const i = intersectDecode(pattern, minPattern, maxPattern);
+    return rangeIntersect(i.min, i.max, parseInt(minPattern), parseInt(maxPattern));
+}
+
+// https://scicomp.stackexchange.com/a/26260
+export function rangeIntersect(r1s: number, r1e: number, r2s: number, r2e: number) {
+    if(r2s > r1e || r1s > r2e) return undefined;
+    return { min: Math.max(r1s, r2s), max: Math.min(r1e, r2e) };
+}
+
+export function intersectDecode(pattern: string, minPattern: string, maxPattern: string) {
+	let minBuilder = [];
+	let maxBuilder = [];
+	for(let i = 0; i < pattern.length; i++) {
+		if(pattern[i] === "x") {
+			minBuilder.push(minPattern[i]);
+			maxBuilder.push(maxPattern[i]);
+		} else if(isNumeric(pattern[i])) {
+			minBuilder.push(pattern[i]);
+			maxBuilder.push(pattern[i]);
+		} else {
+            throw new Error("Invalid input");
+        }
+	}
+	return { min: parseInt(minBuilder.join("")), max: parseInt(maxBuilder.join("")) };
 }
 
 export const isInteger = (v: unknown): v is number => Number.isInteger(v);

@@ -3,7 +3,7 @@
     "description": "Parse Estonian Personal Identification Numbers",
     "author": "Doomnoodles <doomnoodles@hotmail.com> ",
     "repository": "github:estkit/personal-code",
-    "version": "0.0.6",
+    "version": "0.0.7",
     "license": "MIT",
     "keywords": [
         "isikukood",

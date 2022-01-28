@@ -5,16 +5,20 @@ export type IsikukoodParsed = {
 
 export type MinMax = { min?: number, max?: number };
 export type ActualNumber = { actual?: number };
+export type CodePattern = { pattern?: string };
+
+export type DataField = MinMax & ActualNumber & CodePattern;
+
 export type RequiredNumber = { required?: number };
 
 export type IsikukoodData = {
-    gender?: { actual: "male" | "female" | "any" },
-    year?: MinMax & ActualNumber,
-    shortYear?: MinMax & ActualNumber,
-    month?: MinMax & ActualNumber,
-    day?: MinMax & ActualNumber,
-    serial?: MinMax & ActualNumber,
-    checksum?: MinMax & ActualNumber
+    gender?: { actual: "male" | "female" | "any", pattern?: string },
+    year?: DataField,
+    shortYear?: DataField,
+    month?: DataField,
+    day?: DataField,
+    serial?: DataField,
+    checksum?: ActualNumber & CodePattern
 }
 
 export type IsikukoodResults = IsikukoodData & {
@@ -39,7 +43,7 @@ export type LengthError = {
 
 export type GenderAndCenturyError = {
     min: 1,
-    max: 8,
+    max: 6,
     actual: string
 }
 

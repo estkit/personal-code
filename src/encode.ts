@@ -1,5 +1,5 @@
 import { ActualNumber, EncoderCallback, IsikukoodData, IsikukoodParsed, MinMax } from "./types";
-import { asStrSlice, calculateChecksum, getMonthMaxDay, hasLeapYears, isInteger } from "./utils";
+import { asStrSlice, calculateChecksum, getMonthMaxDay, hasLeapYears, isInteger, normalizeMinMax } from "./utils";
 import { isValidYear, isValidShortYear, isValidMonth, isValidDay, isValidSerial } from "./validate";
 
 const encodingTable: EncoderCallback[] = [
@@ -73,11 +73,15 @@ export function randomize(data: IsikukoodData): IsikukoodData {
  */
 export function encode(data: IsikukoodData | IsikukoodParsed) {
     const newData = ((data as any).results || data || {}) as IsikukoodData;
+    Object.keys(newData).forEach(key => (newData as any)[key] = normalizeMinMax((newData as any)[key]));
+
     return encodingTable.map(fn => fn(newData)).join("");
 }
 
 export function encodeGenderAndCentury(data: IsikukoodData) {
     const { gender, year } = data;
+    if(gender?.pattern) return gender.pattern;
+
     const genderOffset = gender?.actual.startsWith("m") ? 0 : (gender?.actual.startsWith("f") ? 1 : NaN);
 
     let century = NaN;
@@ -98,6 +102,7 @@ export function encodeGenderAndCentury(data: IsikukoodData) {
 
 export function encodeYear(data: IsikukoodData) {
     const { year, shortYear } = data;
+    if(shortYear?.pattern) return shortYear.pattern;
 
     const { encoded, encodedMin, encodedMax } = year ? toEncodableString(year, 2, 4, isValidYear) : (shortYear ? toEncodableString(shortYear, 0, 2, isValidShortYear) : {} as any);
     return encoded || intersectEncode(encodedMin, encodedMax, 2);
@@ -105,6 +110,7 @@ export function encodeYear(data: IsikukoodData) {
 
 export function encodeMonth(data: IsikukoodData) {
     const { month } = data;
+    if(month?.pattern) return month.pattern;
 
     const { encoded, encodedMin, encodedMax } = month ? toEncodableString(month, 0, 2, isValidMonth) : {} as any;
     return encoded || intersectEncode(encodedMin, encodedMax, 2);
@@ -112,6 +118,7 @@ export function encodeMonth(data: IsikukoodData) {
 
 export function encodeDay(data: IsikukoodData) {
     const { day, month, year, shortYear } = data;
+    if(day?.pattern) return day.pattern;
 
     const y = year || shortYear;
     const theoreticalMonth = month?.actual || 1;
@@ -126,6 +133,7 @@ export function encodeDay(data: IsikukoodData) {
 
 export function encodeSerial(data: IsikukoodData) {
     const { serial } = data;
+    if(serial?.pattern) return serial.pattern;
 
     const { encoded, encodedMin, encodedMax } = serial ? toEncodableString(serial, 0, 3, isValidSerial) : {} as any;
     return encoded || intersectEncode(encodedMin, encodedMax, 3);
@@ -133,6 +141,7 @@ export function encodeSerial(data: IsikukoodData) {
 
 export function encodeChecksum(data: IsikukoodData) {
     const { checksum } = data;
+    if(checksum?.pattern) return checksum.pattern;
 
     const { encoded, encodedMin, encodedMax } = checksum ? toEncodableString(checksum, 0, 1) : {} as any;
     return encoded || intersectEncode(encodedMin, encodedMax, 1);
@@ -160,7 +169,7 @@ export function intersectEncode(encodedMin: string, encodedMax: string, length: 
     return stringBuilder.join("");
 }
 
-export function toEncodableString(minmaxActual: MinMax & ActualNumber, sliceStart: number, sliceEnd: number, validateCb = (_: any) => true) {
+export function toEncodableString(minmaxActual: MinMax & ActualNumber | undefined, sliceStart: number, sliceEnd: number, validateCb = (_: any) => true) {
     const sliceLength = sliceEnd - sliceStart;
     const { min, max, actual } = minmaxActual!;
     let encoded, encodedMin, encodedMax;

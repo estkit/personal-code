@@ -27,7 +27,7 @@ const { encode, decode, randomize } = require("@estkit/personal-code");
 const { results, errors } = decode("39112120752");
 ```
 
-## Browser script usage
+Browser script usage:
 ```html
 <script src="personalcode.js"></script>
 <script>
